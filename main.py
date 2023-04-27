@@ -1,6 +1,8 @@
 from tkinter import *
+from tkinter import messagebox
 from random import choice
 import pandas
+import os
 
 BACKGROUND_COLOR = "#E9EDC9"
 word = {}
@@ -40,10 +42,15 @@ def flip_card():
 # Learned Words
 def save_word():
     word_bank.remove(word)
-    data = pandas.DataFrame(word_bank)
-    data.to_csv("data/words_to_learn.csv", index=False)
 
-    new_word()
+    if len(word_bank) == 0:
+        messagebox.showinfo(title="Congratulations!", message="You have learned all of the words!")
+        os.remove("data/words_to_learn.csv")
+        window.quit()
+    else:
+        data = pandas.DataFrame(word_bank)
+        data.to_csv("data/words_to_learn.csv", index=False)
+        new_word()
 
 
 # UI Design
