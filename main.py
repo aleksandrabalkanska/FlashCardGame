@@ -5,28 +5,46 @@ from random import choice
 
 BACKGROUND_COLOR = "#E9EDC9"
 
+word_data = pandas.read_csv("data/korean_words.csv")
+word_bank = word_data.to_dict(orient="records")
+word = {}
+
 
 # Generate New Words
 def new_word():
-    word_data = pandas.read_csv("data/korean_words.csv")
-    word_bank = word_data.to_dict(orient="records")
-
-    selected_word = random.choice(word_bank)
-    korean_word = selected_word["Korean"]
-    english_word = selected_word["English"]
+    global word, flip_timer
+    window.after_cancel(flip_timer)
+    word = random.choice(word_bank)
 
     canvas.itemconfig(language_text, text="Korean")
-    canvas.itemconfig(word_text, text=korean_word)
+    canvas.itemconfig(word_text, text=word["Korean"], fill="black")
+    canvas.itemconfig(canvas_image, image=front_card)
+    flip_timer = window.after(3000, flip_card)
+
+
+# Flip the Card
+def flip_card():
+    global word
+    english_word = word["English"]
+
+    canvas.itemconfig(language_text, text="English")
+    canvas.itemconfig(word_text, text=english_word, fill="#FF6969")
+    canvas.itemconfig(canvas_image, image=back_card)
+
+
+# Learned Words
 
 
 # UI Design
 window = Tk()
 window.title("Korean - English Flashcards")
 window.config(padx=25, pady=25, bg=BACKGROUND_COLOR)
+flip_timer = window.after(3000, flip_card)
 
 canvas = Canvas(width=500, height=330, highlightthickness=0, bg=BACKGROUND_COLOR)
 front_card = PhotoImage(file="images/card_front.png")
-canvas.create_image(250, 165, image=front_card)
+back_card = PhotoImage(file="images/card_back.png")
+canvas_image = canvas.create_image(250, 165, image=front_card)
 canvas.grid(column=0, row=0, columnspan=2)
 language_text = canvas.create_text(250, 50, text="", font=("Arial", 20, "italic"))
 word_text = canvas.create_text(250, 160, text="", font=("Arial", 35, "bold"))
